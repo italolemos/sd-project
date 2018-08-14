@@ -1,14 +1,28 @@
 version: '3.3'
 
 services:
-  db:
-    image: postgres
-  web:
-    build: .
-    volumes:
-      - .:/app
+  nginx:
+    image: nginx:latest
+    container_name: tutorial_nginx
     ports:
       - "8000:8000"
+    volumes:
+      - .:/app
+      - ./config/nginx:/etc/nginx/conf.d
+      - /static:/static
+    restart: always
+    depends_on:
+      - web
+  db:
+    image: postgres:latest
+    container_name: tutorial_db
+  web:
+    build: .
+    container_name: tutorial_web
+    volumes:
+      - /static:/static
+    expose:
+      - "8000"
     depends_on:
       - db
     entrypoint: ./run_web.sh
